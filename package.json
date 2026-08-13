@@ -1,0 +1,21 @@
+{
+  "name": "pitwall-overlay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Always-on-top transparent steering/throttle/brake trace overlay for F1 25, fed by pitwall-agent's local telemetry bridge.",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.renderer.json && node -e \"require('fs').cpSync('src/renderer/index.html','dist/renderer/index.html')\"",
+    "start": "npm run build && electron .",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.renderer.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.5.10",
+    "electron": "^31.0.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

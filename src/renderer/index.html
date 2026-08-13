@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>PitWall Overlay</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #container {
+    width: 360px;
+    height: 200px;
+    position: relative;
+  }
+  #container.edit-mode {
+    border: 1px solid #E8002D;
+    box-sizing: border-box;
+    cursor: grab;
+  }
+  #container.edit-mode:active { cursor: grabbing; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #status {
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    font-family: Inter, sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="trace"></canvas>
+    <div id="status"></div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
