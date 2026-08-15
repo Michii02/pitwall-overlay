@@ -16,4 +16,14 @@ export function registerWindowIpc(win: BrowserWindow): void {
     const b = win.getBounds()
     saveBounds({ x: b.x, y: b.y })
   })
+
+  // Driven by the renderer's own WS-connection status (see renderer/main.ts)
+  // — hides the window when the local telemetry bridge is unreachable for a
+  // sustained period, whether because the Settings toggle disabled it or
+  // pitwall-agent itself isn't running. Without this the transparent window
+  // just sits on screen empty forever, ignoring the Settings preference.
+  ipcMain.on('window:setVisible', (_e, visible: boolean) => {
+    if (visible) win.show()
+    else win.hide()
+  })
 }

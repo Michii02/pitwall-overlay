@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld('overlay', {
   getBounds: () => ipcRenderer.invoke('window:getBounds'),
   moveWindow: (x: number, y: number) => ipcRenderer.send('window:move', { x, y }),
   dragEnd: () => ipcRenderer.send('window:dragEnd'),
+  setVisible: (visible: boolean) => ipcRenderer.send('window:setVisible', visible),
 })

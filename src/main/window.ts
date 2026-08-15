@@ -18,6 +18,11 @@ export function createOverlayWindow(): BrowserWindow {
     hasShadow: false,
     focusable: false, // race-mode default; flipped when entering edit mode
     backgroundColor: '#00000000',
+    // Starts hidden rather than flashing empty on launch — the renderer's
+    // WS-status handler (main/index.ts) calls window:setVisible(true) the
+    // moment the local telemetry bridge connects, and editMode.ts's own
+    // toggle independently shows it when entering edit mode.
+    show: false,
     webPreferences: {
       // Essential: Electron throttles rAF in unfocused windows, and this
       // window is unfocused by definition in race mode.

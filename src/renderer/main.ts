@@ -12,11 +12,19 @@ declare global {
       getBounds: () => Promise<{ x: number; y: number; width: number; height: number }>
       moveWindow: (x: number, y: number) => void
       dragEnd: () => void
+      setVisible: (visible: boolean) => void
     }
   }
 }
 
 const BRIDGE_URL = 'ws://127.0.0.1:20780'
+
+// How long the WS connection must stay down before we hide the window — long
+// enough to ride out the 1000ms reconnect loop's normal gaps without
+// flickering, short enough that disabling the Settings toggle (which stops
+// the local bridge server) is noticed promptly. Showing on reconnect is
+// immediate — there's no reason to delay giving the window back.
+const HIDE_AFTER_DISCONNECTED_MS = 6000
 
 function main() {
   const canvas = document.getElementById('trace') as HTMLCanvasElement
@@ -25,10 +33,30 @@ function main() {
 
   const rb = createRingBuffer()
 
+  // Bridges "is the local telemetry WS reachable" to window visibility —
+  // the only mechanism that makes the overlay respect the Settings toggle
+  // (disabling it stops pitwall-agent's local bridge server) and stops it
+  // from sitting on screen empty forever when the agent isn't running.
+  let hideTimer: ReturnType<typeof setTimeout> | null = null
+  const clearHideTimer = () => {
+    if (hideTimer != null) { clearTimeout(hideTimer); hideTimer = null }
+  }
+
   connectTelemetryStream(
     BRIDGE_URL,
     (f) => writeSample(rb, f.steer, f.throttle, f.brake),
-    (connected) => { status.textContent = connected ? '' : 'Waiting for PitWall Agent…' },
+    (connected) => {
+      status.textContent = connected ? '' : 'Waiting for PitWall Agent…'
+      if (connected) {
+        clearHideTimer()
+        window.overlay?.setVisible(true)
+      } else if (hideTimer == null) {
+        hideTimer = setTimeout(() => {
+          hideTimer = null
+          window.overlay?.setVisible(false)
+        }, HIDE_AFTER_DISCONNECTED_MS)
+      }
+    },
   )
 
   startDrawLoop(canvas, rb)
